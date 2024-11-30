@@ -1,0 +1,7 @@
+- hosts: frontend
+  tasks:
+    - name: run frontend
+      shell: |
+        sudo docker pull eagleeye007/frontend
+        sudo docker run -d -p 3000:3000 eagleeye007/frontend
+      become: yes

@@ -1,0 +1,37 @@
+- hosts: aws_instances
+  tasks:
+    - name: Ensure Docker is installed
+      shell: |
+        if ! command -v docker &> /dev/null; then
+          sudo apt-get update -y
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+        fi
+      become: yes
+
+    - name: Pull MongoDB Docker image
+      shell: |
+        sudo docker pull mongo
+      become: yes
+
+    - name: Run MongoDB container
+      shell: |
+        sudo docker run --name mongo_container -d \
+        -e MONGO_INITDB_ROOT_USERNAME=root \
+        -e MONGO_INITDB_ROOT_PASSWORD=example \
+        -e MONGO_INITDB_DATABASE=Fiesta \
+        -p 27017:27017 \
+        mongo
+      become: yes
+
+    - name: Wait for MongoDB to start
+      wait_for:
+        port: 27017
+        delay: 10
+        timeout: 60
+
+    - name: Create a user for the Fiesta database
+      shell: |
+        sudo docker exec -it mongo_container mongo -u root -p example --authenticationDatabase admin --eval 'db.createUser({ user: "fiestaUser", pwd: "fiestaPassword", roles: [{ role: "readWrite", db: "Fiesta" }] })'
+      become: yes

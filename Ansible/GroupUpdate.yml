@@ -1,0 +1,46 @@
+- hosts: mongodb
+  tasks:
+    - name: Update the instance
+      shell: |
+        sudo apt update -y
+        sudo apt upgrade -y
+      become: yes
+
+    - name: Install prerequisites for Docker
+      shell: |
+        sudo apt-get install -y ca-certificates curl
+      become: yes
+
+    - name: Add Docker's official GPG key
+      shell: |
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      become: yes
+
+    - name: Set permissions on the GPG key
+      shell: |
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+      become: yes
+
+    - name: Add the Docker repository
+      shell: |
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      become: yes
+
+    - name: Update apt package index
+      shell: |
+        sudo apt-get update
+      become: yes
+
+    - name: Install Docker
+      shell: |
+        sudo apt-get install -y docker-ce
+      become: yes
+
+    - name: install nodejs with npm
+      shell: |
+        sudo apt-get install -y nodejs npm
+      become: yes

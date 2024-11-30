@@ -1,0 +1,7 @@
+- hosts: backend
+  tasks:
+    - name: run frontend
+      shell: |
+        sudo docker pull eagleeye007/Backend
+        sudo docker run -d -p 3001:3001 eagleeye007/Backend
+      become: yes
